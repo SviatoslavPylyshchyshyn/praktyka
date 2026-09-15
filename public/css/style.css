@@ -9,8 +9,8 @@
 
 body {
   color: white;
-  font-family: 'Orbitron', sans-serif;
-  background-color: red;
+  font-family: 'Courier New', Courier, monospace;
+  background-color: #1E1E1E;
   min-height: 100vh;
   display: flex;
   justify-content: center;
@@ -22,7 +22,7 @@ body {
 .top-container {
   min-height: 100vh;
   width: 100%;
-  background-color: red;
+  background-color: #1E1E1E;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -39,7 +39,7 @@ form {
   align-items: center;
   flex-direction: column;
   gap: 15px;
-  background: rgba(255,255,255,0.05);
+  background: #A66FB5;
   padding: 30px 20px;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.2);
@@ -64,6 +64,36 @@ form input {
   text-align: center;
 }
 
+form select {
+  width: 100%;
+  max-width: 400px;
+  padding: 14px;
+  border-radius: 15px;
+  border: 1px solid lightgray;
+  font-family: inherit;
+  outline: none;
+  box-shadow: 2px 2px 5px gray;
+  text-align: center;
+  cursor: pointer;
+}
+
+.action-row {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.action-row button {
+  flex: 1;
+}
+
+.action-row select {
+  flex: 1;
+  min-width: 0;
+}
+
 /* Button Styles */
 form button {
   padding: 14px 40px;
@@ -80,7 +110,7 @@ form button {
 
 form button:hover {
   color: white;
-  background-color: red;
+  background-color: #A66FB5;
   border: 1px solid white;
   transform: scale(1.05);
 }
@@ -130,34 +160,18 @@ form button:disabled {
   text-shadow: 1px 1px 2px black;
   font-size: 0.9rem;
 }
-.creator-credit {
-  margin-top: 25px;
-  font-size: 1.1rem;
-  letter-spacing: 1px;
-}
-
-.creator-credit p {
-  color: rgba(255, 255, 255, 0.8);
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-}
-
-.creator-credit a {
-  color: white;
-  text-decoration: none;
-  font-weight: 800;
-  border-bottom: 2px solid transparent;
-  transition: all 0.3s ease;
-  margin-left: 5px;
-}
-
-.creator-credit a:hover {
-  border-bottom: 2px solid white;
-  transform: scale(1.1);
-  display: inline-block;
-}
 /* Responsive */
 @media(max-width:768px) {
   form {
     width: 90%;
+  }
+
+  .action-row {
+    flex-direction: column;
+  }
+
+  .action-row button,
+  .action-row select {
+    width: 100%;
   }
 }

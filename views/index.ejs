@@ -21,13 +21,23 @@
 <body>
     <div class="top-container">
         <!-- Note: onsubmit handles the logic -->
-        <div class="creator-credit">
-                <p>Made by <a href="https://www.linkedin.com/in/sarthak-s-b622b022a/" target="_blank">sarthakvs <i class="fa-brands fa-linkedin"></i></a></p>
-        </div>
         <form onsubmit="startProcess(event)">
-            <h1>Youtube to MP3</h1>
+            <h1>Youtube Downloader</h1>
             <input type="text" id="urlInput" placeholder="Paste Link Here" required>
-            <button type="submit" id="dlBtn">Download</button>
+            <select id="formatInput" aria-label="Download format">
+                <option value="mp3">MP3</option>
+                <option value="mp4">MP4</option>
+            </select>
+            <div class="action-row">
+                <button type="submit" id="dlBtn">Download</button>
+                <select id="qualityInput" aria-label="Download quality">
+                    <option value="64">64 kbps</option>
+                    <option value="128" selected>128 kbps</option>
+                    <option value="196">196 kbps</option>
+                    <option value="256">256 kbps</option>
+                    <option value="320">320 kbps</option>
+                </select>
+            </div>
             
             <div id="progress-area">
                 <div class="bar-bg"><div class="bar-fg" id="bar">0%</div></div>
@@ -41,12 +51,15 @@
     <form id="hidden-dl-form" action="/api/stream" method="POST" style="display: none;">
         <input type="hidden" name="downloadUrl" id="hiddenUrl">
         <input type="hidden" name="title" id="hiddenTitle">
+        <input type="hidden" name="format" id="hiddenFormat">
     </form>
     <script>
         async function startProcess(e) {
             e.preventDefault();
             
             const url = document.getElementById('urlInput').value;
+            const format = document.getElementById('formatInput').value;
+            const quality = document.getElementById('qualityInput').value;
             const btn = document.getElementById('dlBtn');
             const area = document.getElementById('progress-area');
             const bar = document.getElementById('bar');
@@ -62,7 +75,7 @@
                 const startRes = await fetch('/api/start', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ url })
+                    body: JSON.stringify({ url, format, quality })
                 });
                 const startData = await startRes.json();
                 
@@ -91,6 +104,7 @@
                         // 4. TRIGGER INSTANT DOWNLOAD VIA HIDDEN FORM
                         document.getElementById('hiddenUrl').value = pollData.downloadUrl;
                         document.getElementById('hiddenTitle').value = startData.title;
+                        document.getElementById('hiddenFormat').value = format;
                         document.getElementById('hidden-dl-form').submit();
 
                         // Reset button shortly after
@@ -104,6 +118,15 @@
                 btn.disabled = false;
             }
         }
+
+        document.getElementById('formatInput').addEventListener('change', (event) => {
+            const qualityInput = document.getElementById('qualityInput');
+            const isMp3 = event.target.value === 'mp3';
+
+            qualityInput.innerHTML = isMp3
+                ? '<option value="64">64 kbps</option><option value="128" selected>128 kbps</option><option value="196">196 kbps</option><option value="256">256 kbps</option><option value="320">320 kbps</option>'
+                : '<option value="360">360p</option><option value="480">480p</option><option value="720">720p</option><option value="1080">1080p</option><option value="1440">1440p</option><option value="4k">4K</option>';
+        });
     </script>
 </body>
 </html>

@@ -42,12 +42,15 @@ app.post('/api/start', async (req, res) => {
     try {
         const videoIdMatch = req.body.url.match(/(?:v=|\/|youtu\.be\/)([0-9A-Za-z_-]{11})/);
         if (!videoIdMatch) return res.status(400).json({ error: 'Invalid URL' });
+        const requestedFormat = req.body.format === 'mp4' ? 'mp4' : 'mp3';
+        const format = requestedFormat === 'mp4' ? req.body.quality || '360' : 'mp3';
+        const audioQuality = requestedFormat === 'mp3' ? req.body.quality || '128' : '128';
 
         // MODIFIED: Use fetchWithRotation instead of axios.get
         const response = await fetchWithRotation({
             method: 'GET',
             url: apiUrl,
-            params: { format: 'mp3', id: videoIdMatch[1], audioQuality: '128' }
+            params: { format, id: videoIdMatch[1], audioQuality }
         });
 
         if (response.data.progressId) {
@@ -73,12 +76,13 @@ app.get('/api/status', async (req, res) => {
 
 // --- STEP 3: STREAM FILE (Remains the same) ---
 app.post('/api/stream', async (req, res) => {
-    const { downloadUrl, title } = req.body;
+    const { downloadUrl, title, format } = req.body;
     try {
         const stream = await axios({ method: 'GET', url: downloadUrl, responseType: 'stream' });
         const safeTitle = (title || 'audio').replace(/[^\w\s]/gi, '').replace(/\s+/g, '_');
-        res.setHeader('Content-Disposition', `attachment; filename="${safeTitle}.mp3"`);
-        res.setHeader('Content-Type', 'audio/mpeg');
+        const extension = format === 'mp4' ? 'mp4' : 'mp3';
+        res.setHeader('Content-Disposition', `attachment; filename="${safeTitle}.${extension}"`);
+        res.setHeader('Content-Type', extension === 'mp4' ? 'video/mp4' : 'audio/mpeg');
         stream.data.pipe(res);
     } catch (e) { 
         console.error(e);
