@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" href="/images/youtube2mp3icon.png" type="image/x-icon">
+    <title>Download History</title>
+</head>
+<body>
+    <video class="background-video" id="background-video" autoplay muted loop playsinline aria-hidden="true">
+        <source src="/videos/smoke-background-animation.mp4" type="video/mp4">
+    </video>
+    <div class="background-overlay" aria-hidden="true"></div>
+    <script>
+        document.getElementById('background-video').playbackRate = 1 / 3;
+    </script>
+
+    <div class="top-container">
+        <nav class="view-switcher" aria-label="Application views">
+            <a class="view-tab" href="/">Main Window</a>
+            <a class="view-tab active" href="/history">Download History</a>
+        </nav>
+
+        <main class="history-panel">
+            <div class="history-header">
+                <h1>Download History</h1>
+                <button type="button" id="clearHistoryBtn" class="clear-history">Clear history</button>
+            </div>
+            <div id="history-list" class="history-list"></div>
+        </main>
+    </div>
+
+    <script>
+        const historyStorageKey = 'youtube-converter-download-history';
+        const historyList = document.getElementById('history-list');
+
+        function getDownloadHistory() {
+            try {
+                return JSON.parse(localStorage.getItem(historyStorageKey)) || [];
+            } catch {
+                return [];
+            }
+        }
+
+        function escapeHtml(value) {
+            const element = document.createElement('span');
+            element.textContent = value || '';
+            return element.innerHTML;
+        }
+
+        function renderDownloadHistory() {
+            const history = getDownloadHistory();
+            historyList.innerHTML = '';
+
+            if (!history.length) {
+                historyList.innerHTML = '<p class="empty-history">No downloads yet.</p>';
+                return;
+            }
+
+            history.forEach((item) => {
+                const entry = document.createElement('article');
+                entry.className = 'history-entry';
+                entry.innerHTML = `
+                    <div>
+                        <strong>${escapeHtml(item.title)}</strong>
+                        <span>${item.format.toUpperCase()} · ${escapeHtml(item.quality)} · ${escapeHtml(item.downloadedAt)}</span>
+                    </div>
+                    <button type="button" class="remove-history" data-id="${item.id}" aria-label="Remove from history">&times;</button>
+                `;
+                historyList.appendChild(entry);
+            });
+        }
+
+        document.getElementById('clearHistoryBtn').addEventListener('click', () => {
+            localStorage.removeItem(historyStorageKey);
+            renderDownloadHistory();
+        });
+
+        historyList.addEventListener('click', (event) => {
+            const removeButton = event.target.closest('.remove-history');
+            if (!removeButton) return;
+            const history = getDownloadHistory().filter((item) => item.id !== removeButton.dataset.id);
+            localStorage.setItem(historyStorageKey, JSON.stringify(history));
+            renderDownloadHistory();
+        });
+
+        renderDownloadHistory();
+    </script>
+</body>
+</html>

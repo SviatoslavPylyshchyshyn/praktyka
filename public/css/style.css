@@ -19,15 +19,157 @@ body {
   text-align: center;
 }
 
+.background-video,
+.background-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.background-video {
+  z-index: 0;
+  object-fit: cover;
+}
+
+.background-overlay {
+  z-index: 1;
+  background: rgba(30, 30, 30, 0.35);
+}
+
 .top-container {
   min-height: 100vh;
   width: 100%;
-  background-color: #1E1E1E;
+  background-color: transparent;
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: flex-start;
+  padding: 20px 20px 20px 8vw;
+}
+
+.view-switcher {
+  width: 600px;
+  max-width: 95%;
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.view-tab {
+  flex: 1;
+  display: block;
+  padding: 12px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 10px;
+  background: rgba(20, 20, 20, 0.72);
+  color: white;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  transition: background 0.25s ease, color 0.25s ease, transform 0.25s ease;
+}
+
+.view-tab:hover,
+.view-tab.active {
+  background: #000;
+  color: white;
+  transform: translateY(-2px);
+}
+
+.app-view {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.history-panel {
+  width: 600px;
+  max-width: 95%;
+  min-height: 280px;
+  padding: 30px 20px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #4a4a4a 0%, #240d0d 48%, #9b1c31 100%);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.history-header {
+  width: 100%;
+  display: flex;
   align-items: center;
-  padding: 20px;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.history-header h1 {
+  font-size: 1.35rem;
+}
+
+.clear-history {
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.45);
+  color: white;
+  font-family: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.history-list {
+  width: 100%;
+  display: grid;
+  gap: 10px;
+}
+
+.history-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 13px 15px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.32);
+  text-align: left;
+}
+
+.history-entry strong,
+.history-entry span {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.history-entry strong {
+  line-height: 1.3;
+}
+
+.history-entry span {
+  margin-top: 5px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.remove-history {
+  flex: 0 0 auto;
+  border: 0;
+  background: transparent;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.empty-history {
+  padding: 30px 0;
+  color: rgba(255, 255, 255, 0.75);
 }
 
 /* Targeted 'form' directly since your HTML tag is just <form> */
@@ -39,14 +181,25 @@ form {
   align-items: center;
   flex-direction: column;
   gap: 15px;
-  background: #A66FB5;
+  --pointer-x: 50%;
+  --pointer-y: 50%;
+  background: linear-gradient(135deg, #4a4a4a 0%, #240d0d 48%, #9b1c31 100%);
+  background-size: 180% 180%;
   padding: 30px 20px;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  transition: transform 0.35s ease, box-shadow 0.35s ease, background-position 0.6s ease;
+}
+
+form:hover {
+  transform: translateY(-6px);
+  background-position: 100% 0;
+  box-shadow: 0 16px 35px rgba(120, 18, 35, 0.45), 0 8px 18px rgba(20, 5, 5, 0.5);
 }
 
 form h1 {
-  font-style: italic;
+  font-style: normal;
+  font-weight: 700;
   text-shadow: 1px 1px darkgray;
   margin-bottom: 10px;
 }
@@ -62,6 +215,37 @@ form input {
   outline: none;
   box-shadow: 2px 2px 5px gray;
   text-align: center;
+  font-size: 1.1rem;
+}
+
+.url-row {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.url-row input {
+  min-width: 0;
+  flex: 1;
+}
+
+.clear-url,
+.filename-toggle {
+  flex: 0 0 auto;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clear-url {
+  font-size: 1.8rem;
+  line-height: 1;
 }
 
 form select {
@@ -75,9 +259,13 @@ form select {
   box-shadow: 2px 2px 5px gray;
   text-align: center;
   cursor: pointer;
+  font-weight: 700;
+  font-size: 1.1rem;
 }
 
-.action-row {
+.format-row,
+.convert-row,
+.download-row {
   width: 100%;
   max-width: 400px;
   display: flex;
@@ -85,13 +273,45 @@ form select {
   gap: 12px;
 }
 
-.action-row button {
+.format-row select,
+.convert-row button,
+.download-row button {
   flex: 1;
 }
 
-.action-row select {
-  flex: 1;
+.format-row select {
   min-width: 0;
+}
+
+.download-row button {
+  width: 100%;
+}
+
+.download-row .filename-toggle {
+  width: 48px;
+  flex: 0 0 48px;
+}
+
+.filename-panel {
+  width: 100%;
+  max-width: 400px;
+}
+
+.filename-panel input {
+  max-width: none;
+}
+
+.convert-row button {
+  width: 100%;
+}
+
+@keyframes download-warning {
+  0%, 100% { background-color: whitesmoke; }
+  50% { background-color: #ff4fc3; color: white; }
+}
+
+.download-warning {
+  animation: download-warning 0.7s ease;
 }
 
 /* Button Styles */
@@ -110,7 +330,7 @@ form button {
 
 form button:hover {
   color: white;
-  background-color: #A66FB5;
+  background-color: #000;
   border: 1px solid white;
   transform: scale(1.05);
 }
@@ -166,12 +386,37 @@ form button:disabled {
     width: 90%;
   }
 
-  .action-row {
+  .top-container {
+    align-items: center;
+    padding: 20px;
+  }
+
+  .app-view {
+    justify-content: center;
+  }
+
+  .history-header {
+    align-items: stretch;
     flex-direction: column;
   }
 
-  .action-row button,
-  .action-row select {
+  .history-entry strong {
+    max-width: 230px;
+  }
+
+  .format-row {
+    flex-direction: column;
+  }
+
+  .format-row select,
+  .convert-row button,
+  .download-row button {
     width: 100%;
   }
+}
+
+form.pointer-active {
+  background:
+    radial-gradient(circle at var(--pointer-x) var(--pointer-y), #8f1f32 0%, rgba(143, 31, 50, 0.5) 18%, transparent 48%),
+    linear-gradient(135deg, #4a4a4a 0%, #240d0d 48%, #9b1c31 100%);
 }

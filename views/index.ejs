@@ -19,31 +19,57 @@
   gtag('config', 'G-9VYKQ8W52L');
 </script>
 <body>
+    <video class="background-video" id="background-video" autoplay muted loop playsinline aria-hidden="true">
+        <source src="/videos/smoke-background-animation.mp4" type="video/mp4">
+    </video>
+    <div class="background-overlay" aria-hidden="true"></div>
+    <script>
+        document.getElementById('background-video').playbackRate = 1 / 3;
+    </script>
     <div class="top-container">
-        <!-- Note: onsubmit handles the logic -->
-        <form onsubmit="startProcess(event)">
-            <h1>Youtube Downloader</h1>
-            <input type="text" id="urlInput" placeholder="Paste Link Here" required>
-            <select id="formatInput" aria-label="Download format">
-                <option value="mp3">MP3</option>
-                <option value="mp4">MP4</option>
-            </select>
-            <div class="action-row">
-                <button type="submit" id="dlBtn">Download</button>
-                <select id="qualityInput" aria-label="Download quality">
-                    <option value="64">64 kbps</option>
-                    <option value="128" selected>128 kbps</option>
-                    <option value="196">196 kbps</option>
-                    <option value="256">256 kbps</option>
-                    <option value="320">320 kbps</option>
-                </select>
-            </div>
-            
-            <div id="progress-area">
-                <div class="bar-bg"><div class="bar-fg" id="bar">0%</div></div>
-                <p id="status-txt">Starting...</p>
-            </div>
-        </form>
+        <nav class="view-switcher" aria-label="Application views">
+            <a class="view-tab active" href="/">Main Window</a>
+            <a class="view-tab" href="/history">Download History</a>
+        </nav>
+
+        <section class="app-view active-view">
+            <form onsubmit="startProcess(event)">
+                <h1>Youtube to MP3 / MP4 Converter</h1>
+                <div class="url-row">
+                    <input type="text" id="urlInput" placeholder="Paste Link Here" required>
+                    <button type="button" id="clearUrlBtn" class="clear-url" aria-label="Clear link" title="Clear link">&times;</button>
+                </div>
+                <div class="format-row">
+                    <select id="formatInput" aria-label="Download format">
+                        <option value="mp3">MP3</option>
+                        <option value="mp4">MP4</option>
+                    </select>
+                    <select id="qualityInput" aria-label="Download quality">
+                        <option value="64">64 kbps</option>
+                        <option value="128" selected>128 kbps</option>
+                        <option value="196">196 kbps</option>
+                        <option value="256">256 kbps</option>
+                        <option value="320">320 kbps</option>
+                    </select>
+                </div>
+                <div class="convert-row">
+                    <button type="submit" id="convertBtn">Convert</button>
+                </div>
+                <div class="download-row">
+                    <button type="button" id="dlBtn">Download</button>
+                    <button type="button" id="filenameToggle" class="filename-toggle" aria-expanded="false" title="Set file name">
+                        <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                    </button>
+                </div>
+                <div id="filename-panel" class="filename-panel" hidden>
+                    <input type="text" id="filenameInput" placeholder="File name (optional)" aria-label="File name">
+                </div>
+                <div id="progress-area">
+                    <div class="bar-bg"><div class="bar-fg" id="bar">0%</div></div>
+                    <p id="status-txt">Starting...</p>
+                </div>
+            </form>
+        </section>
     </div>
     
 
@@ -54,24 +80,49 @@
         <input type="hidden" name="format" id="hiddenFormat">
     </form>
     <script>
+        let convertedFile = null;
+        const historyStorageKey = 'youtube-converter-download-history';
+
+        function getDownloadHistory() {
+            try {
+                return JSON.parse(localStorage.getItem(historyStorageKey)) || [];
+            } catch {
+                return [];
+            }
+        }
+
+        function saveDownloadToHistory(file) {
+            const history = getDownloadHistory();
+            history.unshift({
+                id: Date.now().toString(),
+                title: document.getElementById('filenameInput').value.trim() || file.title,
+                format: file.format,
+                quality: document.getElementById('qualityInput').value + (file.format === 'mp3' ? ' kbps' : 'p'),
+                downloadedAt: new Date().toLocaleString()
+            });
+            localStorage.setItem(historyStorageKey, JSON.stringify(history.slice(0, 50)));
+        }
+
         async function startProcess(e) {
             e.preventDefault();
             
             const url = document.getElementById('urlInput').value;
             const format = document.getElementById('formatInput').value;
             const quality = document.getElementById('qualityInput').value;
-            const btn = document.getElementById('dlBtn');
+            const convertBtn = document.getElementById('convertBtn');
             const area = document.getElementById('progress-area');
             const bar = document.getElementById('bar');
             const txt = document.getElementById('status-txt');
 
-            // UI Reset
-            btn.disabled = true;
+            convertedFile = null;
+            convertBtn.disabled = true;
+            convertBtn.innerText = 'Converting...';
             area.style.display = 'block';
             bar.style.width = '0%';
+            bar.innerText = '0%';
+            bar.style.background = '#4CAF50';
 
             try {
-                // 1. Request Start
                 const startRes = await fetch('/api/start', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
@@ -81,52 +132,113 @@
                 
                 if(!startData.success) throw new Error(startData.error);
 
-                // 2. Start Loop
                 const interval = setInterval(async () => {
-                    const pollRes = await fetch(`/api/status?id=${startData.pid}`);
-                    const pollData = await pollRes.json();
-                    
-                    // Calculate Percentage (API gives 0-1000)
-                    const progress = pollData.progress || 0;
-                    const percent = Math.floor(progress / 10);
-                    
-                    bar.style.width = percent + '%';
-                    bar.innerText = percent + '%';
-                    txt.innerText = "Converting...";
+                    try {
+                        const pollRes = await fetch(`/api/status?id=${startData.pid}`);
+                        const pollData = await pollRes.json();
+                        const progress = pollData.progress || 0;
+                        const percent = Math.floor(progress / 10);
 
-                    // 3. CHECK FOR COMPLETION
-                    // If progress is 1000 OR downloadUrl exists
-                    if (pollData.downloadUrl) {
+                        bar.style.width = percent + '%';
+                        bar.innerText = percent + '%';
+                        txt.innerText = 'Converting...';
+
+                        if (pollData.downloadUrl) {
+                            clearInterval(interval);
+                            convertedFile = {
+                                url: pollData.downloadUrl,
+                                title: startData.title,
+                                format
+                            };
+                            txt.innerText = 'File converted. Click Download.';
+                            bar.style.width = '100%';
+                            bar.innerText = '100%';
+                            bar.style.background = '#2196F3';
+                            convertBtn.disabled = false;
+                            convertBtn.innerText = 'Convert Again';
+                        }
+                    } catch (pollError) {
                         clearInterval(interval);
-                        txt.innerText = "Done! Downloading...";
-                        bar.style.background = "#2196F3"; // Blue
-
-                        // 4. TRIGGER INSTANT DOWNLOAD VIA HIDDEN FORM
-                        document.getElementById('hiddenUrl').value = pollData.downloadUrl;
-                        document.getElementById('hiddenTitle').value = startData.title;
-                        document.getElementById('hiddenFormat').value = format;
-                        document.getElementById('hidden-dl-form').submit();
-
-                        // Reset button shortly after
-                        setTimeout(() => { btn.disabled = false; btn.innerText = "Download Again"; }, 3000);
+                        throw pollError;
                     }
                 }, 6000); // Check every 6 second
 
             } catch (err) {
                 console.error(err);
                 txt.innerText = "Error: " + err.message;
-                btn.disabled = false;
+                convertBtn.disabled = false;
+                convertBtn.innerText = 'Convert';
             }
         }
+
+        document.getElementById('dlBtn').addEventListener('click', () => {
+            if (!convertedFile) {
+                const downloadBtn = document.getElementById('dlBtn');
+                downloadBtn.classList.remove('download-warning');
+                void downloadBtn.offsetWidth;
+                downloadBtn.classList.add('download-warning');
+                alert('File needs to be converted first!');
+                return;
+            }
+
+            document.getElementById('hiddenUrl').value = convertedFile.url;
+            document.getElementById('hiddenTitle').value = document.getElementById('filenameInput').value.trim() || convertedFile.title;
+            document.getElementById('hiddenFormat').value = convertedFile.format;
+            saveDownloadToHistory(convertedFile);
+            document.getElementById('hidden-dl-form').submit();
+        });
+
+        document.getElementById('clearUrlBtn').addEventListener('click', () => {
+            const urlInput = document.getElementById('urlInput');
+            urlInput.value = '';
+            urlInput.focus();
+        });
+
+        document.getElementById('filenameToggle').addEventListener('click', () => {
+            const filenamePanel = document.getElementById('filename-panel');
+            const filenameToggle = document.getElementById('filenameToggle');
+            const isHidden = filenamePanel.hidden;
+
+            filenamePanel.hidden = !isHidden;
+            filenameToggle.setAttribute('aria-expanded', String(isHidden));
+            if (isHidden) document.getElementById('filenameInput').focus();
+        });
 
         document.getElementById('formatInput').addEventListener('change', (event) => {
             const qualityInput = document.getElementById('qualityInput');
             const isMp3 = event.target.value === 'mp3';
+            convertedFile = null;
 
             qualityInput.innerHTML = isMp3
                 ? '<option value="64">64 kbps</option><option value="128" selected>128 kbps</option><option value="196">196 kbps</option><option value="256">256 kbps</option><option value="320">320 kbps</option>'
                 : '<option value="360">360p</option><option value="480">480p</option><option value="720">720p</option><option value="1080">1080p</option><option value="1440">1440p</option><option value="4k">4K</option>';
         });
+
+            document.getElementById('qualityInput').addEventListener('change', () => {
+                convertedFile = null;
+            });
+
+            const mainForm = document.querySelector('.top-container form');
+
+            mainForm.addEventListener('pointerenter', () => {
+                mainForm.classList.add('pointer-active');
+            });
+
+            mainForm.addEventListener('pointermove', (event) => {
+                const bounds = mainForm.getBoundingClientRect();
+                const x = ((event.clientX - bounds.left) / bounds.width) * 100;
+                const y = ((event.clientY - bounds.top) / bounds.height) * 100;
+
+                mainForm.style.setProperty('--pointer-x', `${x}%`);
+                mainForm.style.setProperty('--pointer-y', `${y}%`);
+            });
+
+            mainForm.addEventListener('pointerleave', () => {
+                mainForm.classList.remove('pointer-active');
+                mainForm.style.setProperty('--pointer-x', '50%');
+                mainForm.style.setProperty('--pointer-y', '50%');
+            });
+
     </script>
 </body>
 </html>

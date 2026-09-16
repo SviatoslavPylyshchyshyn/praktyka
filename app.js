@@ -90,5 +90,6 @@ app.post('/api/stream', async (req, res) => {
     }
 });
 app.get('/', (req, res) => res.render("index"));
+app.get('/history', (req, res) => res.render("history"));
 
 app.listen(PORT, () => console.log(`Server running on ${PORT}`));
