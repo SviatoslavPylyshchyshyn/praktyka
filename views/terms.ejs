@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css?v=20260917-4">
     <link rel="icon" href="/favicon-konverter.png" type="image/png">
-    <title>KONVERTER YT | Download History</title>
+    <title>KONVERTER YT | Terms of usage</title>
 </head>
 <body>
     <div class="background-overlay" aria-hidden="true"></div>
@@ -15,17 +14,18 @@
         <div class="top-bar">
             <nav class="view-switcher" aria-label="Application views">
                 <a class="view-tab" href="/" data-i18n="mainWindow">Home</a>
-                <a class="view-tab active" href="/history" data-i18n="downloadHistory">Download History</a>
+                <a class="view-tab" href="/history" data-i18n="downloadHistory">Download History</a>
                 <a class="view-tab settings-tab" href="/settings" data-i18n="settings">Settings</a>
             </nav>
         </div>
 
-        <main class="history-panel">
-            <div class="history-header">
-                <h1 data-i18n="historyTitle">Download History</h1>
-                <button type="button" id="clearHistoryBtn" class="clear-history" data-i18n="clearHistory">Clear history</button>
+        <main class="history-panel terms-panel">
+            <h1 data-i18n="termsTitle">Terms of usage</h1>
+            <div class="terms-content">
+                <p data-i18n="termsText1">This app is provided for personal and educational use. The user is responsible for ensuring that downloading and converting content complies with local copyright laws and the terms of services of the platforms involved.</p>
+                <p data-i18n="termsText2">By using this application, you agree that the service is offered as-is, without warranties and without guarantees of uninterrupted availability.</p>
+                <p data-i18n="termsText3">The project may be used for personal conversions only and should not be used for unauthorized redistribution of protected content.</p>
             </div>
-            <div id="history-list" class="history-list"></div>
         </main>
     </div>
 
@@ -35,9 +35,6 @@
     </footer>
 
     <script>
-        const historyStorageKey = 'youtube-converter-download-history';
-        const historyList = document.getElementById('history-list');
-
         const translations = {
             en: {
                 mainWindow: 'Home',
@@ -46,8 +43,10 @@
                 contact: 'Contact',
                 termsUsage: 'Terms of usage',
                 languageLabel: 'Language',
-                historyTitle: 'Download History',
-                clearHistory: 'Clear history'
+                termsTitle: 'Terms of usage',
+                termsText1: 'This app is provided for personal and educational use. The user is responsible for ensuring that downloading and converting content complies with local copyright laws and the terms of services of the platforms involved.',
+                termsText2: 'By using this application, you agree that the service is offered as-is, without warranties and without guarantees of uninterrupted availability.',
+                termsText3: 'The project may be used for personal conversions only and should not be used for unauthorized redistribution of protected content.'
             },
             uk: {
                 mainWindow: 'Головна',
@@ -56,8 +55,10 @@
                 contact: 'Контакт',
                 termsUsage: 'Умови використання',
                 languageLabel: 'Мова',
-                historyTitle: 'Історія завантажень',
-                clearHistory: 'Очистити історію'
+                termsTitle: 'Умови використання',
+                termsText1: 'Цей додаток надається для особистого та освітнього використання. Користувач несе відповідальність за те, щоб завантаження та конвертація контенту відповідали місцевому законодавству про авторське право та умовам сервісів, що беруть участь.',
+                termsText2: 'Користуючись цим застосунком, ви погоджуєтеся, що сервіс надається як є, без гарантій і без гарантій безперебійної доступності.',
+                termsText3: 'Проєкт може використовуватися лише для особистих конверсій і не повинен використовуватися для несанкціонованого поширення захищеного контенту.'
             }
         };
 
@@ -120,58 +121,6 @@
         }
         updateLanguageFlag();
         setLanguage(savedLanguage);
-
-        function getDownloadHistory() {
-            try {
-                return JSON.parse(localStorage.getItem(historyStorageKey)) || [];
-            } catch {
-                return [];
-            }
-        }
-
-        function escapeHtml(value) {
-            const element = document.createElement('span');
-            element.textContent = value || '';
-            return element.innerHTML;
-        }
-
-        function renderDownloadHistory() {
-            const history = getDownloadHistory();
-            historyList.innerHTML = '';
-
-            if (!history.length) {
-                historyList.innerHTML = '<p class="empty-history">No downloads yet.</p>';
-                return;
-            }
-
-            history.forEach((item) => {
-                const entry = document.createElement('article');
-                entry.className = 'history-entry';
-                entry.innerHTML = `
-                    <div>
-                        <strong>${escapeHtml(item.title)}</strong>
-                        <span>${item.format.toUpperCase()} · ${escapeHtml(item.quality)} · ${escapeHtml(item.downloadedAt)}</span>
-                    </div>
-                    <button type="button" class="remove-history" data-id="${item.id}" aria-label="Remove from history">&times;</button>
-                `;
-                historyList.appendChild(entry);
-            });
-        }
-
-        document.getElementById('clearHistoryBtn').addEventListener('click', () => {
-            localStorage.removeItem(historyStorageKey);
-            renderDownloadHistory();
-        });
-
-        historyList.addEventListener('click', (event) => {
-            const removeButton = event.target.closest('.remove-history');
-            if (!removeButton) return;
-            const history = getDownloadHistory().filter((item) => item.id !== removeButton.dataset.id);
-            localStorage.setItem(historyStorageKey, JSON.stringify(history));
-            renderDownloadHistory();
-        });
-
-        renderDownloadHistory();
     </script>
 </body>
 </html>

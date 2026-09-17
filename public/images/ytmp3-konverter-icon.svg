@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Konverter YT logo">
+  <rect width="512" height="512" fill="#000000"/>
+  <rect x="32" y="32" width="448" height="448" rx="96" fill="#e51d1d"/>
+  <path d="M155 142h73v117l86-117h78l-100 130 104 126h-80l-63-79-25 31v48h-73V142zm73 76v91l41-52-41-39z" fill="#ffffff"/>
+</svg>

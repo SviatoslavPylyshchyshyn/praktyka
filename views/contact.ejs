@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css?v=20260917-4">
+    <link rel="icon" href="/favicon-konverter.png" type="image/png">
+    <title>KONVERTER YT | Contact</title>
+</head>
+<body>
+    <div class="background-overlay" aria-hidden="true"></div>
+
+    <div class="top-container">
+        <div class="top-bar">
+            <nav class="view-switcher" aria-label="Application views">
+                <a class="view-tab" href="/" data-i18n="mainWindow">Home</a>
+                <a class="view-tab" href="/history" data-i18n="downloadHistory">Download History</a>
+                <a class="view-tab settings-tab" href="/settings" data-i18n="settings">Settings</a>
+            </nav>
+        </div>
+
+        <main class="history-panel contact-panel">
+            <h1 data-i18n="contactTitle">Contact</h1>
+            <div class="contact-content">
+                <p data-i18n="contactText">
+                    If you notice any bugs, want to provide feedback, or have ideas for the further development of the project, please send your email with the relevant subject to konverter.mp3and4.support@gmail.com
+                </p>
+            </div>
+        </main>
+    </div>
+
+    <footer class="site-footer">
+        <a href="/terms" class="footer-terms" data-i18n="termsUsage">Terms of usage</a>
+        <a href="/contact" class="footer-terms active" data-i18n="contact">Contact</a>
+    </footer>
+
+    <script>
+        const translations = {
+            en: {
+                mainWindow: 'Home',
+                downloadHistory: 'Download History',
+                settings: 'Settings',
+                contact: 'Contact',
+                termsUsage: 'Terms of usage',
+                languageLabel: 'Language',
+                contactTitle: 'Contact',
+                contactText: 'If you notice any bugs, want to provide feedback, or have ideas for the further development of the project, please send your email with the relevant subject to konverter.mp3and4.support@gmail.com'
+            },
+            uk: {
+                mainWindow: 'Головна',
+                downloadHistory: 'Історія завантажень',
+                settings: 'Налаштування',
+                contact: 'Контакт',
+                termsUsage: 'Умови використання',
+                languageLabel: 'Мова',
+                contactTitle: 'Контакт',
+                contactText: 'Якщо ви помітили якісь глюки, бажаєте надати відгук чи хочете дати ідеї для подальшого розвитку проєкту, напишіть вашого листа з відповідною темою на konverter.mp3and4.support@gmail.com'
+            }
+        };
+
+        const settingsStorageKey = 'youtube-converter-settings';
+
+        function ensureSavedSettings() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(settingsStorageKey) || '{}');
+                const safeSettings = saved && typeof saved === 'object' ? saved : {};
+                localStorage.setItem(settingsStorageKey, JSON.stringify(safeSettings));
+                return safeSettings;
+            } catch {
+                return {};
+            }
+        }
+
+        ensureSavedSettings();
+
+        const languageStorageKey = 'youtube-converter-language';
+
+        function getSavedLanguage() {
+            try {
+                const savedLanguage = localStorage.getItem(languageStorageKey);
+                return savedLanguage === 'uk' || savedLanguage === 'en' ? savedLanguage : 'en';
+            } catch {
+                return 'en';
+            }
+        }
+
+        function setLanguage(lang) {
+            const dictionary = translations[lang] || translations.en;
+            document.querySelectorAll('[data-i18n]').forEach((element) => {
+                const key = element.getAttribute('data-i18n');
+                if (dictionary[key]) {
+                    element.textContent = dictionary[key];
+                }
+            });
+        }
+
+        setLanguage(getSavedLanguage());
+    </script>
+</body>
+</html>

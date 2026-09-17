@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css?v=20260917-4">
+    <link rel="icon" href="/favicon-konverter.png" type="image/png">
+    <title>KONVERTER YT | Settings</title>
+</head>
+<body>
+    <div class="background-overlay" aria-hidden="true"></div>
+
+    <div class="top-container">
+        <div class="top-bar">
+            <nav class="view-switcher" aria-label="Application views">
+                <a class="view-tab" href="/" data-i18n="mainWindow">Main Window</a>
+                <a class="view-tab" href="/history" data-i18n="downloadHistory">Download History</a>
+                <a class="view-tab active settings-tab" href="/settings" data-i18n="settings">Settings</a>
+            </nav>
+        </div>
+
+        <main class="history-panel settings-panel">
+            <h1 data-i18n="settingsTitle">Settings</h1>
+
+            <div class="settings-grid">
+                <label class="settings-field" for="defaultMp3Quality">
+                    <span data-i18n="defaultMp3Label">Default MP3 quality</span>
+                    <div class="select-shell default-quality-shell">
+                        <select id="defaultMp3Quality" class="default-quality-select">
+                            <option value="64">64 kbps</option>
+                            <option value="128">128 kbps</option>
+                            <option value="196">196 kbps</option>
+                            <option value="256">256 kbps</option>
+                            <option value="320">320 kbps</option>
+                        </select>
+                    </div>
+                </label>
+
+                <label class="settings-field" for="defaultMp4Quality">
+                    <span data-i18n="defaultMp4Label">Default MP4 quality</span>
+                    <div class="select-shell default-quality-shell">
+                        <select id="defaultMp4Quality" class="default-quality-select">
+                            <option value="360">360p</option>
+                            <option value="480">480p</option>
+                            <option value="720">720p</option>
+                            <option value="1080">1080p</option>
+                            <option value="1440">1440p</option>
+                            <option value="4k">4K</option>
+                        </select>
+                    </div>
+                </label>
+
+                <label class="settings-field" for="languageSelect">
+                    <span data-i18n="languageLabel">Language</span>
+                    <div class="language-inline-picker select-shell">
+                        <span class="language-flag english-flag" id="languageFlag" aria-hidden="true"></span>
+                        <select id="languageSelect" aria-label="Language selector">
+                            <option value="en">English</option>
+                            <option value="uk">Українська</option>
+                        </select>
+                    </div>
+                </label>
+            </div>
+        </main>
+    </div>
+
+    <footer class="site-footer">
+        <a href="/terms" class="footer-terms" data-i18n="termsUsage">Terms of usage</a>
+        <a href="/contact" class="footer-terms" data-i18n="contact">Contact</a>
+    </footer>
+
+    <script>
+        const settingsStorageKey = 'youtube-converter-settings';
+        const languageStorageKey = 'youtube-converter-language';
+
+        function ensureSavedSettings() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(settingsStorageKey) || '{}');
+                const safeSettings = saved && typeof saved === 'object' ? saved : {};
+                if (!safeSettings.mp3) safeSettings.mp3 = '128';
+                if (!safeSettings.mp4) safeSettings.mp4 = '720';
+                localStorage.setItem(settingsStorageKey, JSON.stringify(safeSettings));
+                return safeSettings;
+            } catch {
+                return { mp3: '128', mp4: '720' };
+            }
+        }
+
+        const translations = {
+            en: {
+                mainWindow: 'Home',
+                downloadHistory: 'Download History',
+                settings: 'Settings',
+                contact: 'Contact',
+                languageLabel: 'Language',
+                settingsTitle: 'Settings',
+                defaultMp3Label: 'Default MP3 quality',
+                defaultMp4Label: 'Default MP4 quality',
+                termsUsage: 'Terms of usage'
+            },
+            uk: {
+                mainWindow: 'Головна',
+                downloadHistory: 'Історія завантажень',
+                settings: 'Налаштування',
+                contact: 'Контакт',
+                languageLabel: 'Мова',
+                settingsTitle: 'Налаштування',
+                defaultMp3Label: 'Якість MP3 за замовчуванням',
+                defaultMp4Label: 'Якість MP4 за замовчуванням',
+                termsUsage: 'Умови використання'
+            }
+        };
+
+        function updateLanguageFlag() {
+            const flag = document.getElementById('languageFlag');
+            const select = document.getElementById('languageSelect');
+            if (!flag || !select) return;
+            flag.classList.toggle('english-flag', select.value === 'en');
+            flag.classList.toggle('uk-flag', select.value === 'uk');
+        }
+
+        function getSavedLanguage() {
+            try {
+                const savedLanguage = localStorage.getItem(languageStorageKey);
+                return savedLanguage === 'uk' || savedLanguage === 'en' ? savedLanguage : 'en';
+            } catch {
+                return 'en';
+            }
+        }
+
+        function setLanguage(lang) {
+            const dictionary = translations[lang] || translations.en;
+            document.querySelectorAll('[data-i18n]').forEach((element) => {
+                const key = element.getAttribute('data-i18n');
+                if (dictionary[key]) {
+                    element.textContent = dictionary[key];
+                }
+            });
+        }
+
+        function saveSettings() {
+            const settings = ensureSavedSettings();
+            settings.mp3 = document.getElementById('defaultMp3Quality').value;
+            settings.mp4 = document.getElementById('defaultMp4Quality').value;
+            localStorage.setItem(settingsStorageKey, JSON.stringify(settings));
+        }
+
+        const languageSelect = document.getElementById('languageSelect');
+        const savedLanguage = getSavedLanguage();
+        if (languageSelect) {
+            languageSelect.value = savedLanguage;
+            languageSelect.addEventListener('change', (event) => {
+                const selectedLanguage = event.target.value;
+                try {
+                    localStorage.setItem(languageStorageKey, selectedLanguage);
+                } catch {}
+                updateLanguageFlag();
+                setLanguage(selectedLanguage);
+            });
+        }
+
+        const settingsValues = ensureSavedSettings();
+        const defaultMp3Quality = document.getElementById('defaultMp3Quality');
+        const defaultMp4Quality = document.getElementById('defaultMp4Quality');
+
+        if (defaultMp3Quality) {
+            defaultMp3Quality.value = settingsValues.mp3 || '128';
+            defaultMp3Quality.addEventListener('change', saveSettings);
+        }
+
+        if (defaultMp4Quality) {
+            defaultMp4Quality.value = settingsValues.mp4 || '720';
+            defaultMp4Quality.addEventListener('change', saveSettings);
+        }
+
+        updateLanguageFlag();
+        setLanguage(savedLanguage);
+    </script>
+</body>
+</html>

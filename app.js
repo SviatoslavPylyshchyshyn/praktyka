@@ -5,6 +5,7 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const brandLogoPath = 'C:\\Users\\User\\Downloads\\ChatGPT Image 17 вер. 2026 р., 14_39_10.png';
 
 app.set('view engine', 'ejs');
 app.use(express.static("public"));
@@ -89,7 +90,14 @@ app.post('/api/stream', async (req, res) => {
         res.send("Error fetching file stream."); 
     }
 });
+app.get('/favicon-konverter.png', (req, res) => {
+    res.sendFile(brandLogoPath);
+});
+
 app.get('/', (req, res) => res.render("index"));
 app.get('/history', (req, res) => res.render("history"));
+app.get('/settings', (req, res) => res.render("settings"));
+app.get('/contact', (req, res) => res.render("contact"));
+app.get('/terms', (req, res) => res.render("terms"));
 
 app.listen(PORT, () => console.log(`Server running on ${PORT}`));

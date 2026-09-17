@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.cdnfonts.com/css/times-new-roman" rel="stylesheet">
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="icon" href="/images/youtube2mp3icon.png" type="image/x-icon">
-    <title>YT2MP3 Magic</title>
+    <link rel="stylesheet" href="/css/style.css?v=20260917-4">
+    <link rel="icon" href="/favicon-konverter.png" type="image/png">
+    <title>KONVERTER YT</title>
 </head>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-9VYKQ8W52L"></script>
@@ -19,59 +19,84 @@
   gtag('config', 'G-9VYKQ8W52L');
 </script>
 <body>
-    <video class="background-video" id="background-video" autoplay muted loop playsinline aria-hidden="true">
-        <source src="/videos/smoke-background-animation.mp4" type="video/mp4">
-    </video>
     <div class="background-overlay" aria-hidden="true"></div>
-    <script>
-        document.getElementById('background-video').playbackRate = 1 / 3;
-    </script>
     <div class="top-container">
-        <nav class="view-switcher" aria-label="Application views">
-            <a class="view-tab active" href="/">Main Window</a>
-            <a class="view-tab" href="/history">Download History</a>
-        </nav>
+        <div class="top-bar">
+            <nav class="view-switcher" aria-label="Application views">
+                <a class="view-tab active" href="/" data-i18n="mainWindow">Home</a>
+                <a class="view-tab" href="/history" data-i18n="downloadHistory">Download History</a>
+                <a class="view-tab settings-tab" href="/settings" data-i18n="settings">Settings</a>
+            </nav>
+        </div>
 
         <section class="app-view active-view">
-            <form onsubmit="startProcess(event)">
-                <h1>Youtube to MP3 / MP4 Converter</h1>
-                <div class="url-row">
-                    <input type="text" id="urlInput" placeholder="Paste Link Here" required>
-                    <button type="button" id="clearUrlBtn" class="clear-url" aria-label="Clear link" title="Clear link">&times;</button>
-                </div>
-                <div class="format-row">
-                    <select id="formatInput" aria-label="Download format">
-                        <option value="mp3">MP3</option>
-                        <option value="mp4">MP4</option>
-                    </select>
-                    <select id="qualityInput" aria-label="Download quality">
-                        <option value="64">64 kbps</option>
-                        <option value="128" selected>128 kbps</option>
-                        <option value="196">196 kbps</option>
-                        <option value="256">256 kbps</option>
-                        <option value="320">320 kbps</option>
-                    </select>
-                </div>
-                <div class="convert-row">
-                    <button type="submit" id="convertBtn">Convert</button>
-                </div>
-                <div class="download-row">
-                    <button type="button" id="dlBtn">Download</button>
-                    <button type="button" id="filenameToggle" class="filename-toggle" aria-expanded="false" title="Set file name">
-                        <i class="fa-solid fa-pen" aria-hidden="true"></i>
-                    </button>
-                </div>
-                <div id="filename-panel" class="filename-panel" hidden>
-                    <input type="text" id="filenameInput" placeholder="File name (optional)" aria-label="File name">
-                </div>
-                <div id="progress-area">
-                    <div class="bar-bg"><div class="bar-fg" id="bar">0%</div></div>
-                    <p id="status-txt">Starting...</p>
-                </div>
-            </form>
+            <div class="main-layout">
+                <form onsubmit="startProcess(event)">
+                    <h1 data-i18n="appTitle">Konverter MP3/MP4</h1>
+                    <div class="url-row">
+                        <input type="text" id="urlInput" data-i18n-placeholder="urlPlaceholder" placeholder="Paste Link Here" required>
+                        <button type="button" id="clearUrlBtn" class="clear-url" aria-label="Clear link" data-i18n-title="clearTooltip" title="Clear link">&times;</button>
+                    </div>
+                    <div class="format-row">
+                        <div class="select-shell">
+                            <select id="formatInput" aria-label="Download format">
+                                <option value="mp3" selected>MP3</option>
+                                <option value="mp4">MP4</option>
+                            </select>
+                        </div>
+                        <div class="select-shell">
+                            <select id="qualityInput" aria-label="Download quality">
+                                <option value="64">64 kbps</option>
+                                <option value="128">128 kbps</option>
+                                <option value="196" selected>196 kbps</option>
+                                <option value="256">256 kbps</option>
+                                <option value="320">320 kbps</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="convert-row">
+                        <button type="submit" id="convertBtn" data-i18n="convertBtn">Convert</button>
+                    </div>
+                    <div class="download-row">
+                        <button type="button" id="dlBtn" data-i18n="downloadBtn">Download</button>
+                        <button type="button" id="filenameToggle" class="filename-toggle" aria-expanded="false" data-i18n-title="filenameTooltip" title="Set file name">
+                            <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <div id="filename-panel" class="filename-panel" hidden>
+                        <input type="text" id="filenameInput" data-i18n-placeholder="filenamePlaceholder" placeholder="File name (optional)" aria-label="File name">
+                    </div>
+                    <div id="progress-area">
+                        <div class="bar-bg"><div class="bar-fg" id="bar">0%</div></div>
+                        <p id="status-txt" data-i18n="statusStarting">Starting...</p>
+                    </div>
+                </form>
+
+                <aside class="instructions-panel" aria-label="Instructions for using the app">
+                    <h2 data-i18n="instructionsTitle">How to use</h2>
+                    <ol>
+                        <li data-i18n="instruction1">Paste any YouTube link into the field.</li>
+                        <li data-i18n="instruction2">Select MP3 or MP4 and choose the quality.</li>
+                        <li>
+                            <span data-i18n="instruction3a">Click</span>
+                            <strong data-i18n="instruction3b">Convert</strong>
+                            <span data-i18n="instruction3c">and wait for the progress bar to finish.</span>
+                        </li>
+                        <li>
+                            <span data-i18n="instruction4a">When it says the file is ready, click</span>
+                            <strong data-i18n="instruction4b">Download</strong><span data-i18n="instruction4c">.</span>
+                        </li>
+                        <li data-i18n="instruction5">Optional: set a custom file name before downloading.</li>
+                    </ol>
+                </aside>
+            </div>
         </section>
     </div>
-    
+
+    <footer class="site-footer">
+        <a href="/terms" class="footer-terms" data-i18n="termsUsage">Terms of usage</a>
+        <a href="/contact" class="footer-terms" data-i18n="contact">Contact</a>
+    </footer>
 
     <!-- HIDDEN FORM FOR DOWNLOADING (Magic happens here) -->
     <form id="hidden-dl-form" action="/api/stream" method="POST" style="display: none;">
@@ -82,6 +107,141 @@
     <script>
         let convertedFile = null;
         const historyStorageKey = 'youtube-converter-download-history';
+
+        const translations = {
+            en: {
+                mainWindow: 'Home',
+                downloadHistory: 'Download History',
+                settings: 'Settings',
+                termsUsage: 'Terms of usage',
+                contact: 'Contact',
+                languageLabel: 'Language',
+                appTitle: 'Konverter MP3/MP4',
+                urlPlaceholder: 'Paste Link Here',
+                clearTooltip: 'Clear link',
+                convertBtn: 'Convert',
+                downloadBtn: 'Download',
+                filenameTooltip: 'Set file name',
+                filenamePlaceholder: 'File name (optional)',
+                statusStarting: 'Starting...',
+                instructionsTitle: 'How to use',
+                instruction1: 'Paste any YouTube link into the field.',
+                instruction2: 'Select MP3 or MP4 and choose the quality.',
+                instruction3a: 'Click',
+                instruction3b: 'Convert',
+                instruction3c: 'and wait for the progress bar to finish.',
+                instruction4a: 'When it says the file is ready, click',
+                instruction4b: 'Download',
+                instruction4c: '.',
+                instruction5: 'Optional: set a custom file name before downloading.'
+            },
+            uk: {
+                mainWindow: 'Головна',
+                downloadHistory: 'Історія завантажень',
+                settings: 'Налаштування',
+                termsUsage: 'Умови використання',
+                contact: 'Контакт',
+                languageLabel: 'Мова',
+                appTitle: 'Konverter MP3/MP4',
+                urlPlaceholder: 'Вставте посилання тут',
+                clearTooltip: 'Очистити посилання',
+                convertBtn: 'Конвертувати',
+                downloadBtn: 'Завантажити',
+                filenameTooltip: 'Встановити назву файлу',
+                filenamePlaceholder: 'Назва файлу (необов’язково)',
+                statusStarting: 'Початок...',
+                instructionsTitle: 'Як користуватися',
+                instruction1: 'Вставте будь-яке посилання YouTube в поле.',
+                instruction2: 'Виберіть MP3 або MP4 і якість.',
+                instruction3a: 'Натисніть',
+                instruction3b: 'Конвертувати',
+                instruction3c: 'і дочекайтеся завершення процесу.',
+                instruction4a: 'Коли файл буде готовий, натисніть',
+                instruction4b: 'Завантажити',
+                instruction4c: '.',
+                instruction5: 'Необов’язково: задайте власну назву файлу перед завантаженням.'
+            }
+        };
+
+        const settingsStorageKey = 'youtube-converter-settings';
+
+        function ensureSavedSettings() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(settingsStorageKey) || '{}');
+                const safeSettings = saved && typeof saved === 'object' ? saved : {};
+                localStorage.setItem(settingsStorageKey, JSON.stringify(safeSettings));
+                return safeSettings;
+            } catch {
+                return {};
+            }
+        }
+
+        ensureSavedSettings();
+
+        function updateLanguageFlag() {
+            const flag = document.getElementById('languageFlag');
+            const select = document.getElementById('languageSelect');
+            if (!flag || !select) return;
+            flag.classList.toggle('english-flag', select.value === 'en');
+            flag.classList.toggle('uk-flag', select.value === 'uk');
+        }
+
+        const languageStorageKey = 'youtube-converter-language';
+
+        function getSavedLanguage() {
+            try {
+                const savedLanguage = localStorage.getItem(languageStorageKey);
+                return savedLanguage === 'uk' || savedLanguage === 'en' ? savedLanguage : 'en';
+            } catch {
+                return 'en';
+            }
+        }
+
+        function setLanguage(lang) {
+            const dictionary = translations[lang] || translations.en;
+            document.querySelectorAll('[data-i18n]').forEach((element) => {
+                const key = element.getAttribute('data-i18n');
+                if (dictionary[key]) {
+                    element.textContent = dictionary[key];
+                }
+            });
+
+            document.querySelectorAll('[data-i18n-placeholder]').forEach((element) => {
+                const key = element.getAttribute('data-i18n-placeholder');
+                if (dictionary[key]) {
+                    element.setAttribute('placeholder', dictionary[key]);
+                }
+            });
+
+            document.querySelectorAll('[data-i18n-title]').forEach((element) => {
+                const key = element.getAttribute('data-i18n-title');
+                if (dictionary[key]) {
+                    element.setAttribute('title', dictionary[key]);
+                    element.setAttribute('aria-label', dictionary[key]);
+                }
+            });
+
+            const statusText = document.getElementById('status-txt');
+            if (statusText && statusText.dataset.defaultText) {
+                statusText.textContent = statusText.dataset.defaultText;
+            }
+        }
+
+        const languageSelect = document.getElementById('languageSelect');
+        const savedLanguage = getSavedLanguage();
+        if (languageSelect) {
+            languageSelect.value = savedLanguage;
+            languageSelect.addEventListener('change', (event) => {
+                const selectedLanguage = event.target.value;
+                try {
+                    localStorage.setItem(languageStorageKey, selectedLanguage);
+                } catch {}
+                updateLanguageFlag();
+                setLanguage(selectedLanguage);
+            });
+        }
+        updateLanguageFlag();
+        setLanguage(savedLanguage);
 
         function getDownloadHistory() {
             try {
@@ -204,19 +364,43 @@
             if (isHidden) document.getElementById('filenameInput').focus();
         });
 
+        function getDefaultQualityForFormat(format) {
+            const settings = ensureSavedSettings();
+            return format === 'mp3' ? (settings.mp3 || '128') : (settings.mp4 || '720');
+        }
+
+        function renderQualityOptions(format, selectedValue) {
+            const qualityInput = document.getElementById('qualityInput');
+            if (!qualityInput) return;
+
+            const isMp3 = format === 'mp3';
+            const allowedValues = isMp3
+                ? ['64', '128', '196', '256', '320']
+                : ['360', '480', '720', '1080', '1440', '4k'];
+
+            const labels = isMp3
+                ? { '64': '64 kbps', '128': '128 kbps', '196': '196 kbps', '256': '256 kbps', '320': '320 kbps' }
+                : { '360': '360p', '480': '480p', '720': '720p', '1080': '1080p', '1440': '1440p', '4k': '4K' };
+
+            qualityInput.innerHTML = allowedValues.map((value) => `
+                <option value="${value}" ${String(value) === String(selectedValue) ? 'selected' : ''}>${labels[value]}</option>
+            `).join('');
+        }
+
         document.getElementById('formatInput').addEventListener('change', (event) => {
             const qualityInput = document.getElementById('qualityInput');
             const isMp3 = event.target.value === 'mp3';
             convertedFile = null;
 
-            qualityInput.innerHTML = isMp3
-                ? '<option value="64">64 kbps</option><option value="128" selected>128 kbps</option><option value="196">196 kbps</option><option value="256">256 kbps</option><option value="320">320 kbps</option>'
-                : '<option value="360">360p</option><option value="480">480p</option><option value="720">720p</option><option value="1080">1080p</option><option value="1440">1440p</option><option value="4k">4K</option>';
+            const selectedValue = getDefaultQualityForFormat(event.target.value);
+            renderQualityOptions(event.target.value, selectedValue);
         });
 
-            document.getElementById('qualityInput').addEventListener('change', () => {
-                convertedFile = null;
-            });
+        document.getElementById('qualityInput').addEventListener('change', () => {
+            convertedFile = null;
+        });
+
+        renderQualityOptions(document.getElementById('formatInput').value, getDefaultQualityForFormat(document.getElementById('formatInput').value));
 
             const mainForm = document.querySelector('.top-container form');
 
